@@ -27,16 +27,8 @@ use core\exception\moodle_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class util {
-    private static string $basemediasiteurl;
-    private static string $sfapikey;
-    private static string $authorization;
-
-    
     public static function get_mymediasite_presentations(int $page): array {
-
-        self::$basemediasiteurl = get_config('mymediasite', 'basemediasiteurl');
-        self::$sfapikey = get_config('mymediasite', 'sfapikey');
-        self::$authorization = get_config('mymediasite', 'authorization');
+        $basemediasiteurl = get_config('mymediasite', 'basemediasiteurl');
 
         $presentations = self::get_presentations($page);
         
@@ -47,7 +39,7 @@ class util {
 
             $listitem = [
                 'title' => $presentation['Title'],
-                'source' => 'https://' . self::$basemediasiteurl . '/Play/' . $presentation['Id'],
+                'source' => 'https://' . $basemediasiteurl . '/Play/' . $presentation['Id'],
                 'date' => strtotime($presentation['CreationDate']),
                 'author' => $presentation['Creator'],
                 'mimetype' => 'Video',
@@ -66,20 +58,24 @@ class util {
 
     private static function get_presentations(int $page): array {
         global $USER;
+        
+        $basemediasiteurl = get_config('mymediasite', 'basemediasiteurl');
+        $sfapikey = get_config('mymediasite', 'sfapikey');
+        $authorization = get_config('mymediasite', 'authorization');
 
         $pagesize = 10;
         $skip = ($page - 1)* $pagesize; // $page is one-based.
 
         $filter = urlencode("Creator eq '{$USER->username}'");
         
-        $endpoint = 'https://' . self::$basemediasiteurl . '/Api/v1/Presentations?$select=full&$orderby=CreationDate+desc&$top=' . $pagesize . '&$skip=' . $skip . '&$filter=' . $filter;
+        $endpoint = 'https://' . $basemediasiteurl . '/Api/v1/Presentations?$select=full&$orderby=CreationDate+desc&$top=' . $pagesize . '&$skip=' . $skip . '&$filter=' . $filter;
         
         $ch = new curl();
         $ch->setHeader([
-                'Content-Type: application/json',
-                'Authorization: ' . self::$authorization,
-                'Accept: application/json',
-                'sfapikey: ' . self::$sfapikey,
+            'Content-Type: application/json',
+            "Authorization: {$authorization}",
+            'Accept: application/json',
+            "sfapikey: {$sfapikey}",
         ]);
 
         $responseraw = $ch->get($endpoint);
