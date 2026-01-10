@@ -36,6 +36,7 @@ class util {
 
         foreach ($presentations['value'] as $presentation) {
             // Process each presentation as needed.
+            $duration = isset($presentation['Duration']) ? $presentation['Duration'] : 0;
 
             $listitem = [
                 'title' => $presentation['Title'],
@@ -44,8 +45,8 @@ class util {
                 'date_formatted' => userdate(strtotime($presentation['CreationDate']), get_string('strftimedatetime', 'langconfig')),
                 'author' => $presentation['Creator'],
                 'mimetype' => 'Video',
-                'duration' => isset($presentation['Duration']) ? $presentation['Duration'] : 0,
-                'duration_formatted' => isset($presentation['Duration']) ? self::format_duration($presentation['Duration']) : '',
+                'duration' => $duration,
+                'duration_formatted' => $duration > 0 ? self::format_duration($duration) : '',
             ];
             $list[] = $listitem;
         }
