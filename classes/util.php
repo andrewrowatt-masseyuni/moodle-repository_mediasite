@@ -36,6 +36,7 @@ class util {
 
         foreach ($presentations['value'] as $presentation) {
             // Process each presentation as needed.
+            $duration = isset($presentation['Duration']) ? $presentation['Duration'] : 0;
 
             $listitem = [
                 'title' => $presentation['Title'],
@@ -44,6 +45,8 @@ class util {
                 'date_formatted' => userdate(strtotime($presentation['CreationDate']), get_string('strftimedatetime', 'langconfig')),
                 'author' => $presentation['Creator'],
                 'mimetype' => 'Video',
+                'duration' => $duration,
+                'duration_formatted' => $duration > 0 ? self::format_duration($duration) : '',
             ];
             $list[] = $listitem;
         }
@@ -98,6 +101,44 @@ class util {
         }
 
         return $response;
+    }
+
+    /**
+     * Format duration from milliseconds to human-readable format
+     *
+     * @param int $milliseconds Duration in milliseconds
+     * @return string Formatted duration string (e.g., "4 Minutes 35 Seconds")
+     */
+    private static function format_duration(int $milliseconds): string {
+        if ($milliseconds <= 0) {
+            return '';
+        }
+
+        $seconds = floor($milliseconds / 1000);
+        $minutes = floor($seconds / 60);
+        $hours = floor($minutes / 60);
+
+        $seconds = $seconds % 60;
+        $minutes = $minutes % 60;
+
+        $parts = [];
+
+        if ($hours > 0) {
+            $label = $hours == 1 ? 'duration_hour' : 'duration_hours';
+            $parts[] = $hours . ' ' . get_string($label, 'repository_mymediasite');
+        }
+
+        if ($minutes > 0) {
+            $label = $minutes == 1 ? 'duration_minute' : 'duration_minutes';
+            $parts[] = $minutes . ' ' . get_string($label, 'repository_mymediasite');
+        }
+
+        if ($seconds > 0) {
+            $label = $seconds == 1 ? 'duration_second' : 'duration_seconds';
+            $parts[] = $seconds . ' ' . get_string($label, 'repository_mymediasite');
+        }
+
+        return implode(' ', $parts);
     }
 
 }
