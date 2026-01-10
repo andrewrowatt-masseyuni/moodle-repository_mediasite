@@ -77,6 +77,7 @@ class get_presentations extends external_api {
             'title' => new external_value(PARAM_TEXT, 'Presentation title'),
             'source' => new external_value(PARAM_URL, 'Presentation source URL'),
             'date' => new external_value(PARAM_INT, 'Presentation creation date'),
+            'date_formatted' => new external_value(PARAM_TEXT, 'Presentation creation date formatted'),
             'author' => new external_value(PARAM_TEXT, 'Presentation author'),
             'mimetype' => new external_value(PARAM_TEXT, 'Presentation mimetype'),
         ])

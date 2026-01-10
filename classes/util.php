@@ -41,6 +41,7 @@ class util {
                 'title' => $presentation['Title'],
                 'source' => 'https://' . $basemediasiteurl . '/Play/' . $presentation['Id'],
                 'date' => strtotime($presentation['CreationDate']),
+                'date_formatted' => userdate(strtotime($presentation['CreationDate']), get_string('strftimedatetime', 'langconfig')),
                 'author' => $presentation['Creator'],
                 'mimetype' => 'Video',
             ];
