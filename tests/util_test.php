@@ -26,9 +26,11 @@ namespace repository_mymediasite;
  * @covers \repository_mymediasite\util
  */
 final class util_test extends \advanced_testcase {
-
     /**
      * Test duration formatting through reflection
+     *
+     * @param int $milliseconds Input duration in milliseconds
+     * @param string $expected Expected formatted duration string
      *
      * @covers \repository_mymediasite\util::format_duration
      * @dataProvider duration_formatting_provider

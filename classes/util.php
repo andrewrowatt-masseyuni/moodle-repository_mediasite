@@ -27,11 +27,17 @@ use core\exception\moodle_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class util {
+    /**
+     * Transforms the list of presentations from the Mediasite for use by the Resposity API
+     *
+     * @param int $page
+     * @return array{list: array, nologin: bool, norefresh: bool, nosearch: bool, page: int, pages: int}
+     */
     public static function get_mymediasite_presentations(int $page): array {
         $basemediasiteurl = get_config('mymediasite', 'basemediasiteurl');
 
         $presentations = self::get_presentations($page);
-        
+
         $list = [];
 
         foreach ($presentations['value'] as $presentation) {
@@ -42,7 +48,10 @@ class util {
                 'title' => $presentation['Title'],
                 'source' => 'https://' . $basemediasiteurl . '/Play/' . $presentation['Id'],
                 'date' => strtotime($presentation['CreationDate']),
-                'date_formatted' => userdate(strtotime($presentation['CreationDate']), get_string('strftimedatetime', 'langconfig')),
+                'date_formatted' => userdate(
+                    strtotime($presentation['CreationDate']),
+                    get_string('strftimedatetime', 'langconfig')
+                ),
                 'author' => $presentation['Creator'],
                 'mimetype' => 'Video',
                 'duration' => $duration,
@@ -56,10 +65,17 @@ class util {
             'norefresh' => true,
             'nosearch' => true,
             'page' => $page,
-            'pages' => -1, // Unknown total pages.
+            'pages' => -1, // Unknown total pages. To Do: implement total count if available.
             'list' => $list];
     }
 
+    /**
+     * Use the Mediasite API to get a list of presentations for the current user.
+     *
+     * @param int $page
+     * @throws moodle_exception
+     * @return array
+     */
     private static function get_presentations(int $page): array {
         global $USER;
 
@@ -68,11 +84,13 @@ class util {
         $authorization = get_config('mymediasite', 'authorization');
 
         $pagesize = 10;
-        $skip = ($page - 1) * $pagesize; // $page is one-based.
+        $skip = ($page - 1) * $pagesize; // Page is one-based.
 
+        $orderby = urlencode('CreationDate desc');
         $filter = urlencode("Creator eq '{$USER->username}'");
-        
-        $endpoint = "https://$basemediasiteurl/Api/v1/Presentations?\$select=full&\$orderby=CreationDate+desc&\$top=$pagesize&\$skip=$skip&\$filter=$filter";
+
+        $endpoint = "https://$basemediasiteurl" .
+            "/Api/v1/Presentations?\$select=full&\$orderby=$orderby&\$top=$pagesize&\$skip=$skip&\$filter=$filter";
 
         $ch = new curl();
         $ch->setHeader([
@@ -85,7 +103,7 @@ class util {
         $responseraw = $ch->get($endpoint);
 
         if ($ch->get_errno() !== 0) {
-            throw new moodle_exception('mediasiteapierror', 'repository_mymediasite', '', $ch->get_errno(),$endpoint);
+            throw new moodle_exception('mediasiteapierror', 'repository_mymediasite', '', $ch->get_errno(), $endpoint);
         }
 
         $info = $ch->get_info();
@@ -96,8 +114,14 @@ class util {
 
         $response = json_decode($responseraw, true);
 
-        if(!$response) {
-            throw new moodle_exception('mediasiteapierror', 'repository_mymediasite', '', 'Invalid JSON response', 'Invalid JSON response');
+        if (!$response) {
+            throw new moodle_exception(
+                'mediasiteapierror',
+                'repository_mymediasite',
+                '',
+                'Invalid JSON response',
+                'Invalid JSON response'
+            );
         }
 
         return $response;

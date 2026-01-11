@@ -36,10 +36,6 @@ require_once($CFG->dirroot . '/repository/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class repository_mymediasite extends repository {
-    public function __construct($repositoryid, $context = SYSCONTEXTID, $options = []) {
-        parent::__construct($repositoryid, $context, $options);
-    }
-
     /**
      * Given a path, and perhaps a search, get a list of files.
      *
@@ -68,15 +64,8 @@ class repository_mymediasite extends repository {
         }
 
         $pageint = intval($page);
-        // echo "F[" . $page . "]";
         $presentations = repository_mymediasite\util::get_mymediasite_presentations($pageint);
-        
-        $ret = [];
-        $ret[] = $presentations;
-        // $ret['list'] = $presentations;
-        $ret['nosearch'] = true;
-        $ret['norefresh'] = true;
-        $ret['nologin'] = true;
+
         return $presentations;
     }
 
@@ -129,19 +118,35 @@ class repository_mymediasite extends repository {
             $authorization = '';
         }
 
-        $mform->addElement('text', 'basemediasiteurl', get_string('basemediasiteurl', 'repository_mymediasite'), ['value' => $basemediasiteurl, 'size' => '40']);
+        $mform->addElement(
+            'text',
+            'basemediasiteurl',
+            get_string('basemediasiteurl', 'repository_mymediasite'),
+            ['value' => $basemediasiteurl, 'size' => '40']
+        );
+
         $mform->setType('basemediasiteurl', PARAM_RAW_TRIMMED);
         $mform->addRule('basemediasiteurl', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('text', 'sfapikey', get_string('sfapikey', 'repository_mymediasite'), ['value' => $sfapikey, 'size' => '40']);
+        $mform->addElement(
+            'text',
+            'sfapikey',
+            get_string('sfapikey', 'repository_mymediasite'),
+            ['value' => $sfapikey, 'size' => '40']
+        );
         $mform->setType('sfapikey', PARAM_RAW_TRIMMED);
         $mform->addRule('sfapikey', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('text', 'authorization', get_string('authorization', 'repository_mymediasite'), ['value' => $authorization, 'size' => '40']);
+        $mform->addElement(
+            'text',
+            'authorization',
+            get_string('authorization', 'repository_mymediasite'),
+            ['value' => $authorization, 'size' => '40']
+        );
         $mform->setType('authorization', PARAM_RAW_TRIMMED);
         $mform->addRule('authorization', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('static', null, '',  get_string('information', 'repository_mymediasite'));
+        $mform->addElement('static', null, '', get_string('information', 'repository_mymediasite'));
     }
 
     /**
@@ -157,7 +162,7 @@ class repository_mymediasite extends repository {
      * @param array $options
      * @return boolean
      */
-    public function set_option($options = array()) {
+    public function set_option($options = []) {
         if (!empty($options['sfapikey'])) {
             set_config('sfapikey', trim($options['sfapikey']), 'mymediasite');
         }

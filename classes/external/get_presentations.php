@@ -22,6 +22,7 @@ use core_external\external_multiple_structure;
 use core_external\external_api;
 use core_external\external_value;
 
+// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
 /* To resolved the Exception - Class "curl" not found issue */
 require_once($CFG->dirroot . '/lib/filelib.php');
 
@@ -33,7 +34,6 @@ require_once($CFG->dirroot . '/lib/filelib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_presentations extends external_api {
-
     /**
      * Describes the parameters for repository_mymediasite_get_presentations
      *
@@ -73,7 +73,7 @@ class get_presentations extends external_api {
      */
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
-        new external_single_structure([
+            new external_single_structure([
             'title' => new external_value(PARAM_TEXT, 'Presentation title'),
             'source' => new external_value(PARAM_URL, 'Presentation source URL'),
             'date' => new external_value(PARAM_INT, 'Presentation creation date'),
@@ -82,7 +82,7 @@ class get_presentations extends external_api {
             'mimetype' => new external_value(PARAM_TEXT, 'Presentation mimetype'),
             'duration' => new external_value(PARAM_INT, 'Presentation duration in milliseconds'),
             'duration_formatted' => new external_value(PARAM_TEXT, 'Presentation duration formatted'),
-        ])
-    );
+            ])
+        );
     }
 }
