@@ -59,7 +59,7 @@ class util {
             ];
 
             if (!empty($presentation['ThumbnailUrl'])) {
-                $listitem['thumbnailurl'] = $presentation['ThumbnailUrl'];
+                $listitem['thumbnail'] = $presentation['ThumbnailUrl'];
             }
 
             $list[] = $listitem;

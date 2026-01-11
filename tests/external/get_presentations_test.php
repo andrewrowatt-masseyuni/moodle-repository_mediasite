@@ -38,10 +38,10 @@ final class get_presentations_test extends \advanced_testcase {
         $structure = $returns->content;
 
         // Verify that the structure has a thumbnailurl field.
-        $this->assertArrayHasKey('thumbnailurl', $structure->keys);
+        $this->assertArrayHasKey('thumbnail', $structure->keys);
 
         // Verify that thumbnailurl is optional.
-        $thumbnailurlfield = $structure->keys['thumbnailurl'];
+        $thumbnailurlfield = $structure->keys['thumbnail'];
         $this->assertEquals(VALUE_OPTIONAL, $thumbnailurlfield->required);
 
         // Verify it's a URL parameter type.
