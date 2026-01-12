@@ -78,6 +78,13 @@ if (!$response || empty($response['ThumbnailUrl'])) {
 $thumbnailurl = $response['ThumbnailUrl'];
 $contentmimetype = $response['ContentMimeType'] ?? 'image/jpeg';
 
+// Validate that the content type is an image to prevent content-type injection.
+$allowedmimetypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+if (!in_array($contentmimetype, $allowedmimetypes)) {
+    http_response_code(400);
+    die('Invalid content type');
+}
+
 // Fetch the actual thumbnail image using Mediasite API credentials.
 $imagech = new curl();
 $imagech->setHeader([
