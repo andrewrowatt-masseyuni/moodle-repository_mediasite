@@ -44,7 +44,7 @@ if (empty($basemediasiteurl) || empty($sfapikey) || empty($authorization)) {
 }
 
 // Call the Mediasite API to get the thumbnail information.
-$endpoint = "https://{$basemediasiteurl}/Api/v1/Presentations('{$presentationid}')/ThumbnailContent";
+$endpoint = "https://{$basemediasiteurl}/Api/v1/Presentations('" . urlencode($presentationid) . "')/ThumbnailContent";
 
 $ch = new curl();
 $ch->setHeader([
@@ -79,7 +79,8 @@ $thumbnailurl = $response['ThumbnailUrl'];
 $contentmimetype = $response['ContentMimeType'] ?? 'image/jpeg';
 
 // Validate that the content type is an image to prevent content-type injection.
-$allowedmimetypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+// Note: SVG is excluded to prevent XSS attacks as SVG files can contain executable JavaScript.
+$allowedmimetypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 if (!in_array($contentmimetype, $allowedmimetypes)) {
     http_response_code(400);
     die('Invalid content type');
@@ -109,6 +110,6 @@ if ($imageinfo['http_code'] != 200) {
 // Return the image with the correct content type.
 header('Content-Type: ' . $contentmimetype);
 header('Content-Length: ' . strlen($imagedata));
-header('Cache-Control: public, max-age=3600'); // Cache for 1 hour.
+header('Cache-Control: private, max-age=3600'); // Private cache for 1 hour.
 
 echo $imagedata;
