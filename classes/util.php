@@ -28,6 +28,13 @@ use core\exception\moodle_exception;
  */
 class util {
     /**
+     * Holds the default page size
+     *
+     * @var int
+     */
+    private const MEDIASITE_API_PAGE_SIZE = 10;
+
+    /**
      * Transforms the list of presentations from the Mediasite for use by the Resposity API
      *
      * @param int $page
@@ -81,7 +88,7 @@ class util {
         $result['norefresh'] = true;
         $result['nosearch'] = true;
         $result['page'] = $page;
-        $result['pages'] = -1; // Unknown total pages. To Do: implement total count if available.
+        $result['pages'] = ceil($presentations['odata.count'] / self::MEDIASITE_API_PAGE_SIZE);
 
         return $result;
     }
@@ -100,14 +107,15 @@ class util {
         $sfapikey = get_config('mediasite', 'sfapikey');
         $authorization = get_config('mediasite', 'authorization');
 
-        $pagesize = 10;
-        $skip = ($page - 1) * $pagesize; // Page is one-based.
+        $skip = ($page - 1) * self::MEDIASITE_API_PAGE_SIZE; // Page is one-based.
 
         $orderby = urlencode('CreationDate desc');
         $filter = urlencode("Creator eq '{$USER->username}'");
 
         $endpoint = "https://$basemediasiteurl" .
-            "/Api/v1/Presentations?\$select=full&\$orderby=$orderby&\$top=$pagesize&\$skip=$skip&\$filter=$filter";
+            "/Api/v1/Presentations?\$select=full&\$orderby=$orderby&\$top="
+            . self::MEDIASITE_API_PAGE_SIZE .
+            "&\$skip=$skip&\$filter=$filter";
 
         $ch = new curl();
         $ch->setHeader([
